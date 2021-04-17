@@ -113,7 +113,7 @@ impl<'a> BattleSearcher<'a> {
         }
 
         // parse winner
-        let winner_id = bytes_to_id(json.get(0).unwrap());
+        let winner_id = bytes_to_id(json.get(2).unwrap());
         let searched_user_won = match winner_id {
             Some(ref winner) => winner == &self.user_id,
             None => false,
@@ -124,7 +124,7 @@ impl<'a> BattleSearcher<'a> {
 
         // parse endType
         let is_forfeit = match json.get(3).unwrap() {
-            Some(bytes) => String::from_utf8_lossy(bytes) == "forfeit",
+            Some(bytes) => String::from_utf8_lossy(bytes) == "\"forfeit\"",
             None => false,
         };
         if !is_forfeit && self.forfeits_only {
