@@ -1,6 +1,6 @@
 [package]
 name = "battlesearch"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Annika L. <annika0uwu@gmail.com>"]
 edition = "2018"
 description = "Searches Pokémon Showdown battle logs"
