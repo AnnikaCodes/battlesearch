@@ -1,8 +1,7 @@
-/// Battlesearch code for Pokémon Showdown battle logs
-
-use std::{any::Any, fs, path::PathBuf, sync::mpsc::Sender};
-use regex::Regex;
 use lazy_static::*;
+use regex::Regex;
+/// Battlesearch code for Pokémon Showdown battle logs
+use std::{any::Any, fs, path::PathBuf};
 
 #[derive(Debug)]
 pub enum BattleSearchError {
@@ -59,15 +58,29 @@ pub struct BattleSearcher<'a> {
 }
 
 impl<'a> BattleSearcher<'a> {
-    pub fn new(username: &str, pikkr_training_rounds: usize, wins_only: bool, forfeits_only: bool) -> Self {
-        let json_parser = pikkr_annika::Pikkr::new(&vec![
-            "$.p1".as_bytes(), // p1 name - idx 0
-            "$.p2".as_bytes(), // p2 name - idx 1
-            "$.winner".as_bytes(), // winner - idx 2
-            "$.endType".as_bytes(), // end type - idx 3
-        ], pikkr_training_rounds).unwrap();
+    pub fn new(
+        username: &str,
+        pikkr_training_rounds: usize,
+        wins_only: bool,
+        forfeits_only: bool,
+    ) -> Self {
+        let json_parser = pikkr_annika::Pikkr::new(
+            &vec![
+                "$.p1".as_bytes(),      // p1 name - idx 0
+                "$.p2".as_bytes(),      // p2 name - idx 1
+                "$.winner".as_bytes(),  // winner - idx 2
+                "$.endType".as_bytes(), // end type - idx 3
+            ],
+            pikkr_training_rounds,
+        )
+        .unwrap();
 
-        Self { user_id: str_to_id(username), json_parser, wins_only, forfeits_only }
+        Self {
+            user_id: str_to_id(username),
+            json_parser,
+            wins_only,
+            forfeits_only,
+        }
     }
 
     /// json is in the form [p1name, p2name, winner, endType]
@@ -78,7 +91,8 @@ impl<'a> BattleSearcher<'a> {
         if json.len() != 4 {
             // should never happen
             return Err(BattleSearchError::FaultyJSON(format!(
-                "BattleSearcher::check_log(): found {} elements in parsed JSON (expected 4)", json.len()
+                "BattleSearcher::check_log(): found {} elements in parsed JSON (expected 4)",
+                json.len()
             )));
         }
 
@@ -118,11 +132,7 @@ impl<'a> BattleSearcher<'a> {
         }
 
         // formatting
-        let win_type_str = if is_forfeit {
-            "by forfeit"
-        } else {
-            "normally"
-        };
+        let win_type_str = if is_forfeit { "by forfeit" } else { "normally" };
         let win_str = match winner_id {
             Some(ref winner) => format!("{} won {}", winner, win_type_str),
             None => String::from("there was no winner"),
@@ -130,16 +140,14 @@ impl<'a> BattleSearcher<'a> {
 
         let room = match path.file_name() {
             Some(os_str) => String::from(os_str.to_str().unwrap_or("unknown file")),
-            None => String::from("unknown file")
-        }.replace(".log.json", "");
+            None => String::from("unknown file"),
+        }
+        .replace(".log.json", "");
 
-        println!("({}) <<{}>> {} vs. {} ({})", date, room, p1id, p2id, win_str);
-
-        Ok(())
-    }
-
-    /// Recursively checks a directory
-    pub fn check_directory(&mut self, directory: PathBuf) -> Result<(), BattleSearchError> {
+        println!(
+            "({}) <<{}>> {} vs. {} ({})",
+            date, room, p1id, p2id, win_str
+        );
 
         Ok(())
     }
